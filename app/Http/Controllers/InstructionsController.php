@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Instruction;
-use App\Models\Instructions;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class InstructionsConstroller extends Controller
+class InstructionsController extends Controller
 {
 
     const INSTRUCTION_NEW = 1;
@@ -25,8 +24,8 @@ class InstructionsConstroller extends Controller
         //f( Auth::guest() )
         //    return redirect('/login');
 
-        $instructions = Instructions::all();
-        return view('instructions', compact('instructions'));
+        $instructions = Instruction::all();
+        return view('instructions.index', compact('instructions'));
     }
 
     /**
@@ -92,7 +91,7 @@ class InstructionsConstroller extends Controller
      */
     public function show($id)
     {
-        $instruction = Instructions::find($id);
+        $instruction = Instruction::find($id);
         $fileContent = Storage::get($instruction->filename);
 
         return view('instructions.show', compact('instruction', 'fileContent'));
@@ -112,7 +111,7 @@ class InstructionsConstroller extends Controller
         if( !Auth::user() )
             return redirect('/login');
 
-        $instruction = Instructions::find($id);
+        $instruction = Instruction::find($id);
 
         if( $instruction->authorId == $user->id )
             return view('instructions.edit', compact('instruction'));
@@ -135,7 +134,7 @@ class InstructionsConstroller extends Controller
         if( !Auth::user() )
             return redirect('/login');
 
-        $instruction = Instructions::find($id);
+        $instruction = Instruction::find($id);
 
         if( $instruction->authorId == $user->id ) {
             $request->validate([
@@ -169,7 +168,7 @@ class InstructionsConstroller extends Controller
         if( !Auth::user() )
             return redirect('/login');
 
-        $instruction = Instructions::find($id);
+        $instruction = Instruction::find($id);
 
         if( $instruction->authorId == $user->id ){
             $instruction->delete();
@@ -183,9 +182,9 @@ class InstructionsConstroller extends Controller
     public function search(Request $request){
         $searchString = $request->get('searchString');
 
-        $instructions = Instructions::where('name', 'like', '%'.$searchString.'%')->get();
+        $instructions = Instruction::where('name', 'like', '%'.$searchString.'%')->get();
 
-        return view('instructions', compact('instructions'));
+        return view('instructions.index', compact('instructions'));
     }
 
 
