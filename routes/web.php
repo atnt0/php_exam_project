@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\InstructionsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,12 +24,17 @@ Route::get('/', function () {
 //Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 
-
 //Route::get('refresh-captcha', '___Controller@refreshCaptcha')->name('refreshCaptcha');
 Route::get('/register/captcha-refresh', [RegisterController::class, 'refreshCaptcha'])->name('refreshCaptcha');
 Auth::routes();
 
 
+
+
+//Route::resource('/instructions', InstructionsController::class)->only([ 'index', 'show' ]);
+Route::post('/instructions/search', [\App\Http\Controllers\InstructionsController::class, 'search'])->name('instructions.search');
+Route::post('/instructions/search_ajax', [\App\Http\Controllers\InstructionsController::class, 'searchAjax'])->name('sound.search.ajax');
+Route::resource('/instructions', InstructionsController::class);
 
 
 
