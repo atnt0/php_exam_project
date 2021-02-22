@@ -46,5 +46,5 @@ user_role: id, user_id, role_id, created_at, updated_at
 
 user_roles: id, title, created_at, updated_at
 
-password_resets: email, token, created_at	
+password_resets: email, token, created_at
 
