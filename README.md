@@ -34,17 +34,17 @@
 
 ##### **План базы данных:**
 
-instructions: id, title, description, file_name, status, author_id, created_at, updated_at
+**instructions**: id, title, description, file_name, status, author_id, created_at, updated_at
 
-instruction_complaints: id, user_id, instruction_id, instruction_сomplaint_status_id, description, created_at, updated_at
+**instruction_complaints**: id, user_id, instruction_id, instruction_сomplaint_status_id, description, created_at, updated_at
 
-instruction_complaint_statuses: id, title, created_at, updated_at
+**instruction_complaint_statuses**: id, title, created_at, updated_at
 
-users: id, name, block, email, email_verified_at, password, remember_token, created_at, updated_at, blocked_at
+**users**: id, name, block, email, email_verified_at, password, remember_token, created_at, updated_at, blocked_at
 
-user_role: id, user_id, role_id, created_at, updated_at
+**user_role**: id, user_id, role_id, created_at, updated_at
 
-user_roles: id, title, created_at, updated_at
+**user_roles**: id, title, created_at, updated_at
 
-password_resets: email, token, created_at
+**password_resets**: email, token, created_at
 
