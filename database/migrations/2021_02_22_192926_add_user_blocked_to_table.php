@@ -13,9 +13,11 @@ class AddUserBlockedToTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->timestamp('blocked_at')->nullable();
-        });
+//        if (!Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->timestamp('blocked_at')->nullable();
+            });
+//        }
     }
 
     /**

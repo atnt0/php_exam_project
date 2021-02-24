@@ -41,4 +41,22 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+
+    public function hasRole(string $role): bool
+    {
+        $rolesCount = $this->roles
+            ->where('name', '=', $role)
+            ->count();
+        return $rolesCount !== 0;
+    }
+
+
 }

@@ -13,11 +13,14 @@ class CreateInstructionComplaintStatusesTable extends Migration
      */
     public function up()
     {
-        Schema::create('instruction_complaint_statuses', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('instruction_complaint_statuses')) {
+            Schema::create('instruction_complaint_statuses', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('title');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

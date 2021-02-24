@@ -16,6 +16,7 @@ class CreateUserRolesTable extends Migration
         if (!Schema::hasTable('user_roles')) {
             Schema::create('user_roles', function (Blueprint $table) {
                 $table->id();
+                $table->string('name')->unique();
                 $table->string('title')->unique();
                 $table->timestamps();
             });

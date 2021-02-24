@@ -8,6 +8,7 @@ require('./bootstrap');
 
 
 require('./scripts/register/captcha');
+require('./scripts/instructions/searchAjax');
 
 
 window.Vue = require('vue').default;

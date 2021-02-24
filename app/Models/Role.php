@@ -9,7 +9,7 @@ class Role extends Model
 {
     use HasFactory;
 
-    public $table = "userroles";
+    public $table = "user_roles";
 
     public function permissions()
     {

@@ -30,7 +30,7 @@
 
                 <div class="col">
                     <div class="float-right">
-                        <form id="searchForm" name="searchForm" action="{{ route('sound.search.ajax') }}" method="post">
+                        <form id="searchForm" name="searchForm" action="{{ route('instructions.search.ajax') }}" method="post">
                             @csrf
                             <input type="text" name="searchString" placeholder="sound name" />
                             <button class="btn btn-primary" type="submit">Search</button>
@@ -40,7 +40,7 @@
             </div>
 
 
-            <table class="table table-striped">
+            <table class="table table-striped" data-table="insert_here">
                 <thead>
                 <tr>
                     <th>Id</th>
@@ -48,24 +48,11 @@
                     <th>Description</th>
                     <th>File name</th>
                     <th>Status</th>
-                    <th>Author id</th>
-                    <th>Created at</th>
-                    <th>Updated at</th>
+                    <th colspan="3">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
-                    @foreach($instructions as $instruction)
-                    <tr>
-                        <td>{{ $instruction->id }}</td>
-                        <td>{{ $instruction->title }}</td>
-                        <td>{{ $instruction->description }}</td>
-                        <td>{{ $instruction->file_name }}</td>
-                        <td>{{ $instruction->status }}</td>
-                        <td>{{ $instruction->author_id }}</td>
-                        <td>{{ $instruction->created_at }}</td>
-                        <td>{{ $instruction->updated_at }}</td>
-                    </tr>
-                    @endforeach
+                    @include('instructions.parts._items')
                 </tbody>
             </table>
 

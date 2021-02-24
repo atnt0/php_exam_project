@@ -18,7 +18,7 @@ class CreateInstructionComplaintsTable extends Migration
                 $table->id();
                 $table->integer('user_id')->unsigned();
                 $table->integer('instruction_id')->unsigned();
-                $table->integer('instruction_сomplaint_status_id')->unsigned();
+                $table->integer('instruction_complaint_status_id')->unsigned();
                 $table->string('description');
                 $table->timestamps();
             });

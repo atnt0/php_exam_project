@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\InstructionsController;
+use App\Http\Controllers\InstructionСomplaintsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,10 +32,14 @@ Auth::routes();
 
 
 
-//Route::resource('/instructions', InstructionsController::class)->only([ 'index', 'show' ]);
-Route::post('/instructions/search', [\App\Http\Controllers\InstructionsController::class, 'search'])->name('instructions.search');
-Route::post('/instructions/search_ajax', [\App\Http\Controllers\InstructionsController::class, 'searchAjax'])->name('sound.search.ajax');
-Route::resource('/instructions', InstructionsController::class);
+
+
+Route::get('/instructions/{soundId}/complaints/create', [InstructionСomplaintsController::class, 'create'])->name('instructions.complaints.createForInstructionId');
+Route::get('/instructions/{soundId}/complaints', [InstructionСomplaintsController::class, 'complaintsByInstructionId'])->name('instructions.complaints');
+Route::resource('/instructions/complaints', InstructionСomplaintsController::class);
+
+Route::post('/instructions/search_ajax', [InstructionsController::class, 'searchAjax'])->name('instructions.search.ajax');
+Route::resource('/instructions', InstructionsController::class); // ->only([ 'index', 'show' ]
 
 
 

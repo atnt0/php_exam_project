@@ -64,7 +64,7 @@
                         <div class="form-group row">
                             <label for="captcha" class="col-md-4 col-form-label text-md-right">Captcha</label>
                             <div class="col-md-6">
-                                <button type="button" class="btn btn-success refresh-button" data-url-captcha="{{ route("refreshCaptcha") }}">Refresh</button>&nbsp;&nbsp;
+                                <button type="button" class="btn btn-warning refresh-button" data-url-captcha="{{ route("refreshCaptcha") }}">Refresh</button>&nbsp;&nbsp;
                                 <span class="captcha-image">{!! Captcha::img() !!}</span><br/><br/>
                                 <input id="captcha" type="text" class="form-control @error('captcha') is-invalid @enderror" name="captcha" placeholder="Enter here captcha-code" required>
                                 @error('captcha')

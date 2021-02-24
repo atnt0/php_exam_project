@@ -7,11 +7,12 @@ use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Webpatser\Uuid\Uuid;
 
 class InstructionsController extends Controller
 {
 
-    const INSTRUCTION_NEW = 1;
+    const INSTRUCTION_NEW = 1; // статус ожидания утверждения администрацией проекта
 
 
     /**
@@ -21,10 +22,17 @@ class InstructionsController extends Controller
      */
     public function index()
     {
-        //f( Auth::guest() )
-        //    return redirect('/login');
+//        $instructions = Instruction::all();
 
-        $instructions = Instruction::all();
+        if( self::hasRightsAdmin() ){
+            // для администрации доступны и не одобренные инструкции
+            $instructions = Instruction::get();
+        }
+        else {
+            // для пользователей доступны только инструкции одобренные администрацией
+            $instructions = Instruction::where('status', '!=', self::INSTRUCTION_NEW)->get();
+        }
+
         return view('instructions.index', compact('instructions'));
     }
 
@@ -55,7 +63,7 @@ class InstructionsController extends Controller
         $request->validate([
             'title' => 'required|min:4',
             'description' => 'required',
-            'file'=>'required|file|mimes:jpg,bmp,png,pdf,txt',
+            'file'=>'required|file|mimes:txt', // jpg,bmp,png,pdf,
         ]);
 
 
@@ -65,9 +73,7 @@ class InstructionsController extends Controller
 
         $newFilePath = Storage::putFileAs('public', new File($file->getPathname()), $fileName);
 
-        $user = Auth::user();
         $userId = Auth::user() ? Auth::user()->id : -1;
-
 
         $instruction = new Instruction([
             'title' => $request->get('title'),
@@ -92,9 +98,15 @@ class InstructionsController extends Controller
     public function show($id)
     {
         $instruction = Instruction::find($id);
-        $fileContent = Storage::get($instruction->filename);
 
-        return view('instructions.show', compact('instruction', 'fileContent'));
+        if( empty($instruction) )
+            abort(404);
+
+        $fileLink = '/storage/'. basename($instruction->file_name); // для получения ссылки на публичный доступ
+
+        $fileContent = Storage::get('public/'. $instruction->file_name); // для получения содержимого локально
+
+        return view('instructions.show', compact('instruction', 'fileLink', 'fileContent'));
     }
 
     /**
@@ -113,7 +125,8 @@ class InstructionsController extends Controller
 
         $instruction = Instruction::find($id);
 
-        if( $instruction->authorId == $user->id )
+        //if( Auth::user() && (Auth::user()->id == $instruction->author_id || Auth::user()->hasRole('Admin') ) )
+        if( self::hasRights($instruction) )
             return view('instructions.edit', compact('instruction'));
         else
             return redirect('/instructions');
@@ -136,13 +149,15 @@ class InstructionsController extends Controller
 
         $instruction = Instruction::find($id);
 
-        if( $instruction->authorId == $user->id ) {
+//        if( $instruction->authorId == $user->id ) {
+//        if( Auth::user() && (Auth::user()->id == $instruction->author_id || Auth::user()->hasRole('Admin')) ) {
+        if( self::hasRights($instruction) ) {
             $request->validate([
                 'title' => 'required',
                 'description' => 'required',
             ]);
 
-            $instruction->name = $request->get('title');
+            $instruction->title = $request->get('title');
             $instruction->description = $request->get('description');
             $instruction->status = $request->get('status');
 
@@ -170,7 +185,8 @@ class InstructionsController extends Controller
 
         $instruction = Instruction::find($id);
 
-        if( $instruction->authorId == $user->id ){
+//        if( $instruction->authorId == $user->id ){
+        if( self::hasRights($instruction) ) {
             $instruction->delete();
             return redirect('/instructions')->with('success', 'Instruction deleted!');
         }
@@ -179,13 +195,51 @@ class InstructionsController extends Controller
     }
 
 
-    public function search(Request $request){
+
+    /**
+     * @return bool
+     * Description: определить есть ли права изменения данной записи
+     *  разместил здесь, так как в модель User слишком много требуется добавлять, что не есть хорошо
+     */
+    public static function hasRights($instruction): bool
+    {
+        return Auth::user() && (Auth::user()->id == $instruction->author_id || Auth::user()->hasRole('Admin') );
+    }
+
+    /**
+     * @return bool
+     * Description: для определения прав пользователя, отличается от hasRights
+     */
+    public static function hasRightsAdmin(): bool
+    {
+        return Auth::user() && Auth::user()->hasRole('Admin' );
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * Description: ajax-поиск в инструкциях по названию
+     */
+    public function searchAjax(Request $request){
         $searchString = $request->get('searchString');
 
-        $instructions = Instruction::where('name', 'like', '%'.$searchString.'%')->get();
+        if( self::hasRightsAdmin() ){
+            // для администрации доступны и не одобренные инструкции
+            $instructions = Instruction::where('title', 'like', '%'.$searchString.'%')
+                //->where('status', '!=', self::INSTRUCTION_NEW)
+                ->get();
+        }
+        else {
+            // для пользователей доступны только инструкции одобренные администрацией
+            $instructions = Instruction::where('title', 'like', '%' . $searchString . '%')
+                ->where('status', '!=', self::INSTRUCTION_NEW)
+                ->get();
+        }
 
-        return view('instructions.index', compact('instructions'));
+        return view('instructions.parts._items', compact('instructions', ));
     }
+
+
 
 
 }

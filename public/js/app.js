@@ -1884,6 +1884,8 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 __webpack_require__(/*! ./scripts/register/captcha */ "./resources/js/scripts/register/captcha.js");
 
+__webpack_require__(/*! ./scripts/instructions/searchAjax */ "./resources/js/scripts/instructions/searchAjax.js");
+
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js").default;
 /**
  * The following block of code may be used to automatically register your
@@ -1949,6 +1951,32 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/***/ }),
+
+/***/ "./resources/js/scripts/instructions/searchAjax.js":
+/*!*********************************************************!*\
+  !*** ./resources/js/scripts/instructions/searchAjax.js ***!
+  \*********************************************************/
+/***/ (() => {
+
+var matchQueryLocation = '/instructions'; // if( window.location.pathname.substr(0, matchQueryLocation.length) == matchQueryLocation ){
+
+if (window.location.pathname == matchQueryLocation) {
+  $(document).ready(function () {
+    $('form[name="searchForm"]').submit(function (e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: $(this).serialize(),
+        success: function success(data) {
+          $('table[data-table="insert_here"] tbody').empty().html(data);
+        }
+      });
+    });
+  });
+}
 
 /***/ }),
 
