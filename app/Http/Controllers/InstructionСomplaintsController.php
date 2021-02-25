@@ -49,7 +49,7 @@ class InstructionСomplaintsController extends Controller
      */
     public function create()
     {
-        //
+        return view('instructioncomplaints.create', compact('soundId'));
     }
 
     /**
@@ -135,10 +135,8 @@ class InstructionСomplaintsController extends Controller
             )
             ->get();
 
-        //dd($complaints);
-
         $instruction = Instruction::find($instructionId)->firstOrFail()->title;
-        //dd($instruction);
+
         return view('instructioncomplaints.indexComplaintsForInstruction', compact('complaints', 'instruction'));
     }
 

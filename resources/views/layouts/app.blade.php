@@ -43,6 +43,12 @@
                             <a class="nav-link nav-link" href="{{ route('instructions.index') }}">Instructions</a>
                         </li>
 
+                        @if ( Auth::user() && Auth::user()->hasRole('Admin') )
+                        <li class="nav-item">
+                            <a class="nav-link nav-link" href="{{ route('complaints.index') }}">Сomplaints</a>
+                        </li>
+                        @endif
+
                         <!-- Authentication Links -->
                         @guest
                             @if (Route::has('login'))

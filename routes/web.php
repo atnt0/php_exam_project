@@ -34,9 +34,9 @@ Auth::routes();
 
 
 
-Route::get('/instructions/{soundId}/complaints/create', [InstructionСomplaintsController::class, 'create'])->name('instructions.complaints.createForInstructionId');
-Route::get('/instructions/{soundId}/complaints', [InstructionСomplaintsController::class, 'complaintsByInstructionId'])->name('instructions.complaints');
+
 Route::resource('/instructions/complaints', InstructionСomplaintsController::class);
+//TODO выяснить как переименовать роутинг с "complaints.index" в "instructions.complaints.index"
 
 Route::post('/instructions/search_ajax', [InstructionsController::class, 'searchAjax'])->name('instructions.search.ajax');
 Route::resource('/instructions', InstructionsController::class); // ->only([ 'index', 'show' ]

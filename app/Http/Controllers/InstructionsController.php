@@ -236,7 +236,7 @@ class InstructionsController extends Controller
                 ->get();
         }
 
-        return view('instructions.parts._items', compact('instructions', ));
+        return view('instructions.parts._items', compact('instructions'));
     }
 
 
