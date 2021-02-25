@@ -34,7 +34,8 @@ Auth::routes();
 
 
 
-
+Route::get('/instructions/{instructionId}/complaints/create', [InstructionСomplaintsController::class, 'create'])->name('instructions.complaints.createForInstructionId');
+Route::get('/instructions/{instructionId}/complaints', [InstructionСomplaintsController::class, 'complaintsByInstructionId'])->name('instructions.complaints');
 Route::resource('/instructions/complaints', InstructionСomplaintsController::class);
 //TODO выяснить как переименовать роутинг с "complaints.index" в "instructions.complaints.index"
 
