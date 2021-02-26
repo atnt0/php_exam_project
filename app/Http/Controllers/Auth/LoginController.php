@@ -41,93 +41,42 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    // определить блокировку пользователя на этапе логина не получается
-//    // переопределил метод логина для проверки блокировки пользователя
-//    public function login(Request $request)
-//    {
-//        //dd($request->all());
-//
-//        $result = Auth::attempt([
-//            'email' => $request->email,
-//            'password' => $request->password,
-//            //'isActive' => '1'
-//        ]);
-//        dd($result);
-//
-//        if ( $result )
-//        {
-//            dd($user);
-//
-//            // Updated this line
-//            return $this->sendLoginResponse($request);
-//
-//            // OR this one
-//            // return $this->authenticated($request, auth()->user());
-//        }
-//        else
-//        {
-//            return $this->sendFailedLoginResponse($request, 'auth.failed_status');
-//        }
-//    }
-
-//    /**
-//     * Handle a login request to the application.
-//     *
-//     * @param  \Illuminate\Http\Request  $request
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function login(Request $request)
-//    {
-//        //dd($request);
-//
-//        $this->validateLogin($request);
-//
-//        $user = User::where('email', $request->email)->firstOrFail();
-//
-//        if ( $user && $user->blocked_at != null ) {
-//            return $this->sendLockedAccountResponse($request);
-//        }
-//
-//        if ($this->hasTooManyLoginAttempts($request)) {
-//            $this->fireLockoutEvent($request);
-//
-//            return $this->sendLockoutResponse($request);
-//        }
-//
-//        if ($this->attemptLogin($request)) {
-//            return $this->sendLoginResponse($request);
-//        }
-//
-//        $this->incrementLoginAttempts($request);
-//
-//        return $this->sendFailedLoginResponse($request);
-//    }
-//
-//    /**
-//     * Get the locked account response instance.
-//     *
-//     * @param \Illuminate\Http\Request  $request
-//     * @return \Illuminate\Http\Response
-//     */
-//    protected function sendLockedAccountResponse(Request $request)
-//    {
-//        return redirect()->back()
-//            ->withInput($request->only($this->loginUsername(), 'remember'))
-//            ->withErrors([
-//                $this->loginUsername() => $this->getLockedAccountMessage(),
-//            ]);
-//    }
 
     /**
-     * Get the locked account message.
-     *
-     * @return string
+     * @param Request $request
+     * @return array
+     * Description: Добавление условия проверки на блокировку пользователя
+     * но только при авторизации. Добавить проверку блокировки еще где-то, чтобы выкидывать пользователя из системы
      */
-    protected function getLockedAccountMessage()
+    protected function credentials(Request $request) {
+        return array_merge($request->only($this->username(), 'password'), ['blocked_at' => null]);
+    }
+
+    /**
+     * Get the failed login response instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendFailedLoginResponse(Request $request)
     {
-        return Lang::has('auth.locked')
-            ? Lang::get('auth.locked')
-            : 'Your account is inactive. Please contact the Support Desk for help.';
+        $errors = [$this->username() => trans('auth.failed')];
+
+        // Load user from database
+        $user = User::where($this->username(), $request->{$this->username()})->first();
+
+        // Check if user was successfully loaded, that the password matches
+        // and active is not 1. If so, override the default error message.
+        if ($user && \Hash::check($request->password, $user->password) && $user->active != 1) {
+            $errors = [$this->username() => trans('auth.userblocked')];
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json($errors, 422);
+        }
+        return redirect()->back()
+            ->withInput($request->only($this->username(), 'remember'))
+            ->withErrors($errors);
     }
 
 }
