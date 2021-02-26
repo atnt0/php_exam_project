@@ -52,11 +52,8 @@ Route::resource('/instructions/complaints', InstructionСomplaintsController::cl
         // get-pages
         'index' => 'instructions.complaints.index', // all complaints
         'show' => 'instructions.complaints.show',
-        //'create' => 'instructions.complaints.create', // стандартный отключим, он нам не нужен
-        //'edit' => 'instructions.complaints.edit',
         // post-events
         'store' => 'instructions.complaints.store',
-        //'update' => 'instructions.complaints.update',
         'destroy' => 'instructions.complaints.destroy',
     ]);
 //TODO выяснить как переименовать роутинг с "complaints.index" в "instructions.complaints.index"
@@ -70,4 +67,5 @@ Route::resource('/instructions', InstructionsController::class); // ->only([ 'in
 
 
 
+Route::resource('/users', \App\Http\Controllers\UserController::class);
 

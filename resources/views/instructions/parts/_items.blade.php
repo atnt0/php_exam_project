@@ -35,7 +35,7 @@
 
         </td>
         <td>
-        @if( \App\Http\Controllers\InstructionsController::hasRightsAdmin() )
+        @if( \App\Models\User::hasRightsAdmin() )
             <a href="{{ route('instructions.complaints.indexComplaintsforInstruction', $instruction->id )}}"
                class="btn btn-primary" title="All complaints for Instruction">All_Complaints</a>
         @endif

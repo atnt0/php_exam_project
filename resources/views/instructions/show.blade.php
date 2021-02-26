@@ -96,7 +96,7 @@
                             <a href="{{ route('instructions.edit', $instruction->id) }}" class="btn btn-primary">Edit</a>
                         </div>
 
-                        @if( $instruction->status_approved == 0 && \App\Http\Controllers\InstructionsController::hasRightsAdmin() )
+                        @if( $instruction->status_approved == 0 && \App\Models\User::hasRightsAdmin() )
                         <div class="buttons-item d-inline-block">
 {{--                           , ['instructionId' => $instruction->id]--}}
                             <form action="{{ route('instructions.setApproved', $instruction->id) }}" method="post">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Instruction;
+use App\Models\User;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +26,7 @@ class InstructionsController extends Controller
     {
 //        $instructions = Instruction::all();
 
-        if( self::hasRightsAdmin() ){
+        if( User::hasRightsAdmin() ){
             // для администрации доступны ВСЕ и одобренные и не одобренные инструкции
             $instructions = Instruction::get();
         }
@@ -212,14 +213,6 @@ class InstructionsController extends Controller
         return Auth::user() && (Auth::user()->id == $author_id || Auth::user()->hasRole('admin') ); // Admin
     }
 
-    /**
-     * @return bool
-     * Description: для определения прав пользователя, отличается от hasRights
-     */
-    public static function hasRightsAdmin(): bool
-    {
-        return Auth::user() && Auth::user()->hasRole('admin' ); // Admin
-    }
 
     /**
      * @param Request $request
@@ -229,7 +222,7 @@ class InstructionsController extends Controller
     public function searchAjax(Request $request){
         $searchString = $request->get('searchString');
 
-        if( self::hasRightsAdmin() ){
+        if( User::hasRightsAdmin() ){
             // для администрации доступны и не одобренные инструкции
             $instructions = Instruction::where('title', 'like', '%'.$searchString.'%')
                 //->where('status_approved', '!=', self::INSTRUCTION_NEW)
@@ -251,7 +244,7 @@ class InstructionsController extends Controller
         if ( Auth::guest() )
             return redirect('/login');
 
-        if( ! self::hasRightsAdmin() )
+        if( ! User::hasRightsAdmin() )
             abort(403); //TODO change to current address whit message
 
 

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
@@ -56,6 +57,16 @@ class User extends Authenticatable
             ->where('name', '=', mb_strtolower($role) )
             ->count();
         return $rolesCount !== 0;
+    }
+
+
+    /**
+     * @return bool
+     * Description: для определения прав пользователя, отличается от hasRights
+     */
+    public static function hasRightsAdmin(): bool
+    {
+        return Auth::user() && Auth::user()->hasRole('admin' ); // Admin
     }
 
 

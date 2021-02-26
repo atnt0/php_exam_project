@@ -47,6 +47,9 @@
                         <li class="nav-item">
                             <a class="nav-link nav-link" href="{{ route('instructions.complaints.index') }}">Complaints</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link" href="{{ route('users.index') }}">Users</a>
+                        </li>
                         @endif
 
                         <!-- Authentication Links -->
@@ -71,8 +74,7 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
+                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
 

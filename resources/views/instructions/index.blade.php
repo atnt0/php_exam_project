@@ -19,7 +19,6 @@
             </div>
 
             <div class="row">
-
                 @if (Auth::guest())
 {{--                    Only registred users can be use this function.--}}
                 @else
