@@ -53,7 +53,7 @@ class User extends Authenticatable
     public function hasRole(string $role): bool
     {
         $rolesCount = $this->roles
-            ->where('name', '=', $role)
+            ->where('name', '=', mb_strtolower($role) )
             ->count();
         return $rolesCount !== 0;
     }

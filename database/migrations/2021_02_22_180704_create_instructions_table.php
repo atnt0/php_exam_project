@@ -17,9 +17,9 @@ class CreateInstructionsTable extends Migration
             Schema::create('instructions', function (Blueprint $table) {
                 $table->id();
                 $table->string('title', 100);
-                $table->string('description', 255);
+                $table->string('description', 511);
                 $table->string('file_name', 255);
-                $table->integer('status')->default(1);
+                $table->integer('status_approved')->default(0);
                 $table->integer('author_id')->unsigned();
                 $table->timestamps();
             });

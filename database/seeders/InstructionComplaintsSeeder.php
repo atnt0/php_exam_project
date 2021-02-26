@@ -21,7 +21,7 @@ class InstructionComplaintsSeeder extends Seeder
                 'user_id' => 2,
                 'instruction_id' => 1,
                 'instruction_complaint_status_id' => 1,
-                'description' => 'Холодильник приехал из магазина пустой, максимум 1 бал за сервис',
+                'description' => 'Данная инструкция к холодильнику устарела! Где мне искать информацию про льдогенератор, которого в старой версии данной модели не было?',
             ],
             [
                 'user_id' => 2,

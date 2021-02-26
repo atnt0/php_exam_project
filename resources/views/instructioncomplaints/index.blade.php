@@ -4,7 +4,7 @@
 @section('main')
     <div class="row">
         <div class="col-12">
-            <h1 class="display-3">Instruction Complaints</h1>
+            <h1 class="display-3">Complaints for Instructions</h1>
             <br>
 
             <table class="table table-striped">

@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Instruction;
+use App\Models\InstructionComplaint;
+use App\Models\InstructionComplaintStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class InstructionСomplaintsController extends Controller
 {
+    const DEFAULT_INSTRUCTION_COMPLAINT_STATUS = 1;
+
     /**
      * Display a listing of the resource.
      *
@@ -23,44 +27,53 @@ class InstructionСomplaintsController extends Controller
             return redirect('/instructions');
 
 
-        $complaints = DB::table('instruction_complaints as ic')
-            ->join('users as u', 'ic.user_id', '=', 'u.id')
-            ->join('instruction_complaint_statuses as ics', 'ic.instruction_complaint_status_id', '=', 'ics.id')
-            ->select(
-                'ic.id as id',
-                'ic.instruction_id as instruction_id',
-                'ic.description as description',
-                'ics.title as title',
-                'u.name as name',
-                'ic.created_at as created_at',
-                'ic.updated_at as updated_at',
-            )
-            ->get();
-
-//        dd($complaints);
+        // видны ВСЕ жалобы, но только для админов
+        $complaints = InstructionComplaint::getComplaints();
 
         return view('instructioncomplaints.index', compact('complaints' )); // 'role'
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('instructioncomplaints.create', compact('soundId'));
-    }
+//    /**
+//     * Show the form for creating a new resource.
+//     *
+//     * @return \Illuminate\Http\Response
+//     */
+//    public function create()
+//    {
+//        return view('instructions.complaints.createForInstructionId', compact('instructionId'));
+//    }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
+     *  Description: event create For Instruction Id
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'description' => 'required|min:10',
+            'instruction_id' => 'required|integer',
+        ]);
+
+        //TODO добавить проверку на пользователя
+        $userId = Auth::user()->id;
+
+        $instructionComplaint = new InstructionComplaint([
+            'user_id' => $userId,
+            'instruction_id' => $request->get('instruction_id'),
+            'instruction_complaint_status_id' => self::DEFAULT_INSTRUCTION_COMPLAINT_STATUS,
+            'description' => $request->get('description'),
+        ]);
+
+        $instructionComplaint->save();
+
+        $instructionId = $instructionComplaint->instruction_id;
+
+        return redirect()
+            ->route('instructions.complaints.show', [$instructionComplaint->id])
+            ->with('success', 'Instruction Complaint saved!');
     }
 
     /**
@@ -69,33 +82,45 @@ class InstructionСomplaintsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($complaintId)
     {
-        //
+        $complaint = InstructionComplaint::find($complaintId);
+//            ->firstOrFail(); // возвращает первую запись вместо необходимой, воздержаться от использования
+
+        if( empty($complaint) )
+            abort(404);
+
+        $instruction = Instruction::find($complaint->instruction_id);
+
+
+        if( empty($instruction) )
+            abort(404);
+
+        return view('instructioncomplaints.show', compact('complaint', 'instruction'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+//    /**
+//     * Show the form for editing the specified resource.
+//     *
+//     * @param  int  $id
+//     * @return \Illuminate\Http\Response
+//     */
+//    public function edit($id)
+//    {
+//        //
+//    }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+//    /**
+//     * Update the specified resource in storage.
+//     *
+//     * @param  \Illuminate\Http\Request  $request
+//     * @param  int  $id
+//     * @return \Illuminate\Http\Response
+//     */
+//    public function update(Request $request, $id)
+//    {
+//        //
+//    }
 
     /**
      * Remove the specified resource from storage.
@@ -105,42 +130,105 @@ class InstructionСomplaintsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if( !Auth::user() )
+            return redirect('/login');
+
+        $instructionComplaint = InstructionComplaint::find($id);
+
+        if( empty($instructionComplaint) )
+            abort(404);
+
+        $instructionComplaint->delete();
+
+        return redirect()
+            ->route('instructions.complaints.index')
+            ->with('success', 'Instruction deleted!');
     }
 
 
 
 
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createForInstructionId($instructionId)
+    {
+        $instruction = Instruction::find($instructionId);
+
+        if( empty($instruction) )
+            abort(404);
+
+        if( empty($instruction) )
+            return redirect('/instructions');
+
+        return view('instructioncomplaints.createForInstructionId', compact('instruction'));
+    }
 
     public function complaintsByInstructionId($instructionId)
     {
         if ( Auth::guest() )
             return redirect('/login');
 
+        if( !InstructionsController::hasRightsAdmin() )
+            return redirect('/instructions');
 
-        $complaints = DB::table('instruction_complaints as ic')
-            ->join('users as u', 'ic.user_id', '=', 'u.id')
-            ->join('instruction_complaint_statuses as ics', 'ic.instruction_complaint_status_id', '=', 'ics.id')
+        $instruction = Instruction::find($instructionId);
 
-            ->where('ic.instruction_id', '=', $instructionId)
-            ->where('ics.name', '=', 'processed') // только одобренные // pending
-            ->select(
-                'ic.id as id',
-                'ic.instruction_id as instruction_id',
-                'ic.description as description',
-                'ics.title as title',
-                'u.name as name',
-                'ic.created_at as created_at',
-                'ic.updated_at as updated_at',
-            )
-            ->get();
+        if( empty($instruction) )
+            abort(404);
 
-        $instruction = Instruction::find($instructionId)->firstOrFail()->title;
+        if( empty($instruction) )
+            return redirect('/instructions');
+
+        // видны ВСЕ жалобы для одной инструкции, но только для админав
+        $complaints = InstructionComplaint::getComplaintsForInstruction($instructionId);
 
         return view('instructioncomplaints.indexComplaintsForInstruction', compact('complaints', 'instruction'));
     }
 
+    // событие - принять жалобу
+    public function setAccepted($instructionComplaintId)
+    {
+        $complaint = InstructionComplaint::find($instructionComplaintId);
 
+        if( empty($complaint) )
+            abort(404);
+
+        $statusAccepted = InstructionComplaintStatus::getStatusByName('accepted');
+
+        if( empty($statusAccepted) )
+            abort(404);
+
+        $complaint->instruction_complaint_status_id = $statusAccepted->id;
+        $complaint->save();
+
+        return redirect()
+            ->route('instructions.complaints.index')
+            ->with('success', 'Instruction Complaint Accepted!');
+    }
+
+    // событие - отклонить жалобу
+    public function setRejected($instructionComplaintId)
+    {
+        $complaint = InstructionComplaint::find($instructionComplaintId);
+
+        if( empty($complaint) )
+            abort(404);
+
+        $statusRejected = InstructionComplaintStatus::getStatusByName('rejected');
+
+        if( empty($statusRejected) )
+            abort(404);
+
+        $complaint->instruction_complaint_status_id = $statusRejected->id;
+        $complaint->save();
+
+        return redirect()
+            ->route('instructions.complaints.index')
+            ->with('success', 'Instruction Complaint Rejected!');
+    }
 
 
 }

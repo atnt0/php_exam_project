@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddUserBlockedToTable extends Migration
+class AddInstructionApprovedToTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,9 +14,9 @@ class AddUserBlockedToTable extends Migration
     public function up()
     {
         // IF EXISTS !!!
-        if ( Schema::hasTable('users') ) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->timestamp('blocked_at')->nullable();
+        if ( Schema::hasTable('instructions') ) {
+            Schema::table('instructions', function (Blueprint $table) {
+                $table->timestamp('approved_at')->nullable();
             });
         }
     }
@@ -28,8 +28,8 @@ class AddUserBlockedToTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            //Schema::dropIfExists('blocked_at_to_users');
+        Schema::table('table', function (Blueprint $table) {
+            //
         });
     }
 }

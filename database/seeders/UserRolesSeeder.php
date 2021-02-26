@@ -31,7 +31,7 @@ class UserRolesSeeder extends Seeder
                 $roleFound = DB::table('user_roles')->where('name', '=', $role['name'])->first();
                 if( !$roleFound ) {
                     $admin = new Role();
-                    $admin->name = $role['title'];
+                    $admin->name = $role['name'];
                     $admin->title = $role['title'];
                     $admin->save();
                 }

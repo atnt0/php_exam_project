@@ -28,13 +28,12 @@
 
                 <div class="form-group">
                     <label for="last_name">Description:</label>
-                    <input type="text" class="form-control" name="description" value="{{ $instruction->description }}" />
+                    <textarea class="form-control" name="description" rows="10">{{ $instruction->description }}</textarea>
                 </div>
 
-                <div class="form-group">
-                    <label for="email">Status:</label>
-                    <input type="number" class="form-control" name="status" value="{{ $instruction->status }}" />
-                </div>
+{{--                //TODO for update File need create another method --}}
+
+                <br>
 
                 <button type="submit" class="btn btn-primary">Update</button>
             </form>

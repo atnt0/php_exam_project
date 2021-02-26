@@ -33,6 +33,10 @@ class InstructionComplaintStatusesSeeder extends Seeder
                 'name' => 'rejected',
                 'title' => 'Rejected',
             ],
+            [
+                'name' => 'accepted',
+                'title' => 'Accepted',
+            ],
         ];
 
         if( count($arrayStatuses) > 0 ){

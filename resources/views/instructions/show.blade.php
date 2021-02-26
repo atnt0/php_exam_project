@@ -16,6 +16,20 @@
                 <br />
             @endif
 
+            @if (Auth::guest())
+                Only registred users can be use this function.
+            @else
+                <a href="{{ route('instructions.complaints.createForInstructionId', ['instructionId' => $instruction->id]) }}"
+                       class="btn btn-primary">Add complaint</a>
+            @endif
+
+            @if( \Illuminate\Support\Facades\Auth::user()->hasRole('admin') )
+                <a href="{{ route('instructions.complaints.indexComplaintsforInstruction', ['instructionId' => $instruction->id]) }}"
+                   class="btn btn-primary" title="All complaints for Instruction">All Complaints</a>
+            @endif
+            <br>
+            <br>
+
             <div class="row">
                 <div class="col col-6">
                     <div class="row">
@@ -38,11 +52,19 @@
                 <div class="col col-6">
                     <div class="row">
                         <div class="col-4 text-right"><b>Status:</b></div>
-                        <div class="col-8">{{ $instruction->status }}</div>
+                        <div class="col-8"><b>
+                                <b>{{ ($instruction->status_approved == 1 ? "Approved" : "non Approved") }}</b>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-4 text-right"><b>Author id:</b></div>
-                        <div class="col-8">{{ $instruction->author_id }}</div>
+                        <div class="col-8">
+                            <span data-author-id="{{ $instruction->author_id }}">
+                                {{ \App\Models\User::find($instruction->author_id)->name }}
+                                {{  " [id: ". $instruction->author_id ."]" }}
+                                {{ ($instruction->author_id == Auth::user()->id ? " (You)" : "" ) }}
+                            </span>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-4 text-right"><b>Created at:</b></div>
@@ -59,6 +81,41 @@
             <div class="row">
                 <div class="col-12">
                     <a href="{{ $fileLink }}"  class="btn btn-info text-white" download>Download file</a>
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="col-12">
+                    <h4 class="display-6">Actions:</h4>
+
+                    <div class="buttons">
+
+                    @if( \App\Http\Controllers\InstructionsController::hasRights($instruction->author_id) )
+                        <div class="buttons-item d-inline-block">
+                            <a href="{{ route('instructions.edit', $instruction->id) }}" class="btn btn-primary">Edit</a>
+                        </div>
+
+                        @if( $instruction->status_approved == 0 && \App\Http\Controllers\InstructionsController::hasRightsAdmin() )
+                        <div class="buttons-item d-inline-block">
+{{--                           , ['instructionId' => $instruction->id]--}}
+                            <form action="{{ route('instructions.setApproved', $instruction->id) }}" method="post">
+                                @csrf
+                                <button class="btn btn-warning" type="submit">Approve</button>
+                            </form>
+                        </div>
+                        @endif
+
+                        <div class="buttons-item d-inline-block">
+                            <form action="{{ route('instructions.destroy', $instruction->id) }}" method="post">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-danger" type="submit">Delete</button>
+                            </form>
+                        </div>
+                    @endif
+
+                    </div>
                 </div>
             </div>
             <br>

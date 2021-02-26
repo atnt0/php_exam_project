@@ -12,7 +12,8 @@ use Webpatser\Uuid\Uuid;
 class InstructionsController extends Controller
 {
 
-    const INSTRUCTION_NEW = 1; // статус ожидания утверждения администрацией проекта
+    const INSTRUCTION_NEW_STATUS_APPROVED = 0; // 0 - статус подтверждения - ожидание утверждения администрацией проекта
+    const INSTRUCTION_STATUS_APPROVED_YES = 1; // 1 - статус подтверждения - утверждено администрацией проекта
 
 
     /**
@@ -25,12 +26,12 @@ class InstructionsController extends Controller
 //        $instructions = Instruction::all();
 
         if( self::hasRightsAdmin() ){
-            // для администрации доступны и не одобренные инструкции
+            // для администрации доступны ВСЕ и одобренные и не одобренные инструкции
             $instructions = Instruction::get();
         }
         else {
             // для пользователей доступны только инструкции одобренные администрацией
-            $instructions = Instruction::where('status', '!=', self::INSTRUCTION_NEW)->get();
+            $instructions = Instruction::where('status_approved', '!=', self::INSTRUCTION_NEW_STATUS_APPROVED)->get();
         }
 
         return view('instructions.index', compact('instructions'));
@@ -79,14 +80,15 @@ class InstructionsController extends Controller
             'title' => $request->get('title'),
             'description' => $request->get('description'),
             'file_name' => $fileName,
-            'status' => self::INSTRUCTION_NEW,
+            'status_approved' => self::INSTRUCTION_NEW_STATUS_APPROVED,
             'author_id' => $userId,
         ]);
 
         $instruction->save();
 
-        //TODO может быть ссылку заменить на роут?
-        return redirect('/instructions')->with('success', 'Instruction saved!');
+        return redirect()
+            ->route('instructions.show', [$instruction->id])
+            ->with('success', 'Instruction saved!');
     }
 
     /**
@@ -101,6 +103,11 @@ class InstructionsController extends Controller
 
         if( empty($instruction) )
             abort(404);
+
+        // если не подтверждено, не юзер это не автор инструкции или не админ
+        if( $instruction->status_approved == 0 && !self::hasRights($instruction->author_id) )
+            abort(403);
+
 
         $fileLink = '/storage/'. basename($instruction->file_name); // для получения ссылки на публичный доступ
 
@@ -125,11 +132,11 @@ class InstructionsController extends Controller
 
         $instruction = Instruction::find($id);
 
-        //if( Auth::user() && (Auth::user()->id == $instruction->author_id || Auth::user()->hasRole('Admin') ) )
-        if( self::hasRights($instruction) )
-            return view('instructions.edit', compact('instruction'));
-        else
-            return redirect('/instructions');
+        if( !self::hasRights($instruction->author_id) )
+            abort(403);
+
+        //if( Auth::user() && (Auth::user()->id == $instruction->author_id || Auth::user()->hasRole('admin') ) )
+        return view('instructions.edit', compact('instruction'));
     }
 
     /**
@@ -149,24 +156,25 @@ class InstructionsController extends Controller
 
         $instruction = Instruction::find($id);
 
+        if( !self::hasRights($instruction->author_id) )
+            abort(403);
+
 //        if( $instruction->authorId == $user->id ) {
-//        if( Auth::user() && (Auth::user()->id == $instruction->author_id || Auth::user()->hasRole('Admin')) ) {
-        if( self::hasRights($instruction) ) {
-            $request->validate([
-                'title' => 'required',
-                'description' => 'required',
-            ]);
+//        if( Auth::user() && (Auth::user()->id == $instruction->author_id || Auth::user()->hasRole('admin')) ) {
+        $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+        ]);
 
-            $instruction->title = $request->get('title');
-            $instruction->description = $request->get('description');
-            $instruction->status = $request->get('status');
+        $instruction->title = $request->get('title');
+        $instruction->description = $request->get('description');
+//        $instruction->status = $request->get('status_approved');
 
-            $instruction->save();
+        $instruction->save();
 
-            return redirect('/instructions')->with('success', 'Instruction updated!');
-        }
-        else
-            return redirect('/instructions');
+        return redirect()
+            ->route('instructions.show', [$instruction->id])
+            ->with('success', 'Instruction updated!');
     }
 
     /**
@@ -177,21 +185,19 @@ class InstructionsController extends Controller
      */
     public function destroy($id)
     {
-        $user = Auth::user();
-
-        //if ( Auth::guest() )
         if( !Auth::user() )
             return redirect('/login');
 
         $instruction = Instruction::find($id);
 
-//        if( $instruction->authorId == $user->id ){
-        if( self::hasRights($instruction) ) {
-            $instruction->delete();
-            return redirect('/instructions')->with('success', 'Instruction deleted!');
-        }
-        else
-            return redirect('/instructions');
+        if( !self::hasRights($instruction->author_id) )
+            abort(403);
+
+        $instruction->delete();
+
+        return redirect()
+            ->route('instructions.index')
+            ->with('success', 'Instruction deleted!');
     }
 
 
@@ -201,9 +207,9 @@ class InstructionsController extends Controller
      * Description: определить есть ли права изменения данной записи
      *  разместил здесь, так как в модель User слишком много требуется добавлять, что не есть хорошо
      */
-    public static function hasRights($instruction): bool
+    public static function hasRights($author_id): bool
     {
-        return Auth::user() && (Auth::user()->id == $instruction->author_id || Auth::user()->hasRole('Admin') );
+        return Auth::user() && (Auth::user()->id == $author_id || Auth::user()->hasRole('admin') ); // Admin
     }
 
     /**
@@ -212,7 +218,7 @@ class InstructionsController extends Controller
      */
     public static function hasRightsAdmin(): bool
     {
-        return Auth::user() && Auth::user()->hasRole('Admin' );
+        return Auth::user() && Auth::user()->hasRole('admin' ); // Admin
     }
 
     /**
@@ -226,19 +232,46 @@ class InstructionsController extends Controller
         if( self::hasRightsAdmin() ){
             // для администрации доступны и не одобренные инструкции
             $instructions = Instruction::where('title', 'like', '%'.$searchString.'%')
-                //->where('status', '!=', self::INSTRUCTION_NEW)
+                //->where('status_approved', '!=', self::INSTRUCTION_NEW)
                 ->get();
         }
         else {
             // для пользователей доступны только инструкции одобренные администрацией
             $instructions = Instruction::where('title', 'like', '%' . $searchString . '%')
-                ->where('status', '!=', self::INSTRUCTION_NEW)
+                ->where('status_approved', '!=', self::INSTRUCTION_NEW_STATUS_APPROVED)
                 ->get();
         }
 
         return view('instructions.parts._items', compact('instructions'));
     }
 
+    // event for Approved this instruction
+    public function setApproved(Request $request, $instructionId) //
+    {
+        if ( Auth::guest() )
+            return redirect('/login');
+
+        if( ! self::hasRightsAdmin() )
+            abort(403); //TODO change to current address whit message
+
+
+        $instruction = Instruction::find($instructionId);
+
+        if( empty($instruction) )
+            abort(404);
+
+        if( !self::hasRights($instruction->author_id) )
+            abort(403);
+
+        $instruction->status_approved = self::INSTRUCTION_STATUS_APPROVED_YES;
+        $instruction->approved_at = date("Y-m-d h:i:s", time());
+
+        $instruction->save();
+
+        return redirect()
+            ->route('instructions.show', [$instructionId])
+            ->with('success', 'Instruction Approved!');
+    }
 
 
 

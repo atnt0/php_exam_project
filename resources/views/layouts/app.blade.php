@@ -43,9 +43,9 @@
                             <a class="nav-link nav-link" href="{{ route('instructions.index') }}">Instructions</a>
                         </li>
 
-                        @if ( Auth::user() && Auth::user()->hasRole('Admin') )
+                        @if ( Auth::user() && Auth::user()->hasRole('admin') )
                         <li class="nav-item">
-                            <a class="nav-link nav-link" href="{{ route('complaints.index') }}">Сomplaints</a>
+                            <a class="nav-link nav-link" href="{{ route('instructions.complaints.index') }}">Complaints</a>
                         </li>
                         @endif
 
