@@ -47,7 +47,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @include('users.parts._items')
+                    @include('users.parts._items')
                 </tbody>
             </table>
         </div>

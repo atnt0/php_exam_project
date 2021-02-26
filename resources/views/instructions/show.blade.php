@@ -23,11 +23,10 @@
                        class="btn btn-primary">Add complaint</a>
             @endif
 
-            @if( \Illuminate\Support\Facades\Auth::user()->hasRole('admin') )
+            @if( \Illuminate\Support\Facades\Auth::user() != null && \Illuminate\Support\Facades\Auth::user()->hasRole('admin') )
                 <a href="{{ route('instructions.complaints.indexComplaintsforInstruction', ['instructionId' => $instruction->id]) }}"
                    class="btn btn-primary" title="All complaints for Instruction">All Complaints</a>
             @endif
-            <br>
             <br>
 
             <div class="row">
@@ -62,7 +61,7 @@
                             <span data-author-id="{{ $instruction->author_id }}">
                                 {{ \App\Models\User::find($instruction->author_id)->name }}
                                 {{  " [id: ". $instruction->author_id ."]" }}
-                                {{ ($instruction->author_id == Auth::user()->id ? " (You)" : "" ) }}
+                                {{ (\Illuminate\Support\Facades\Auth::user() != null && $instruction->author_id == Auth::user()->id ? " (You)" : "" ) }}
                             </span>
                         </div>
                     </div>

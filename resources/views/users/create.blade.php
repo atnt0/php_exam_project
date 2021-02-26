@@ -50,6 +50,13 @@
                         </div>
                     </div>
 
+{{--                how to connect confirmation for password? --}}
+{{--                    <div class="col-xs-12 col-sm-12 col-md-12">--}}
+{{--                        <div class="form-group">--}}
+{{--                            <strong>Password confirmation:</strong>--}}
+{{--                            <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
 
                     <div class="col-xs-12 col-sm-12 col-md-12">{{--  text-center --}}
                         <button type="submit" class="btn btn-primary">Submit</button>
