@@ -24,7 +24,7 @@
             @endif
 
             @if( \Illuminate\Support\Facades\Auth::user() != null && \Illuminate\Support\Facades\Auth::user()->hasRole('admin') )
-                <a href="{{ route('instructions.complaints.indexComplaintsforInstruction', ['instructionId' => $instruction->id]) }}"
+                <a href="{{ route('instructions.complaints.indexComplaintsForInstruction', ['instructionId' => $instruction->id]) }}"
                    class="btn btn-primary" title="All complaints for Instruction">All Complaints</a>
             @endif
             <br>

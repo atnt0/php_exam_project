@@ -39,7 +39,7 @@ Auth::routes();
 Route::get('/instruction/{instructionId}/complaints/create', [InstructionСomplaintsController::class, 'createForInstructionId'])
     ->name('instructions.complaints.createForInstructionId');
 Route::get('/instruction/{instructionId}/complaints', [InstructionСomplaintsController::class, 'complaintsByInstructionId'])
-    ->name('instructions.complaints.indexComplaintsforInstruction'); // complaints for one instruction
+    ->name('instructions.complaints.indexComplaintsForInstruction'); // complaints for one instruction
 
 
 Route::post('/instructions/complaints/{instructionComplaintId}/set_accepted', [InstructionСomplaintsController::class, 'setAccepted'])
@@ -48,6 +48,7 @@ Route::post('/instructions/complaints/{instructionComplaintId}/set_rejected', [I
     ->name('instructions.complaints.setRejected');
 
 Route::resource('/instructions/complaints', InstructionСomplaintsController::class)
+    // ->only([ 'index', 'show' ])
     ->except([ 'create', 'edit', 'update' ]) // исключить
     ->names([
         // get-pages
@@ -57,22 +58,17 @@ Route::resource('/instructions/complaints', InstructionСomplaintsController::cl
         'store' => 'instructions.complaints.store',
         'destroy' => 'instructions.complaints.destroy',
     ]);
-//TODO выяснить как переименовать роутинг с "complaints.index" в "instructions.complaints.index"
 
 
 Route::post('/instructions/search_ajax', [InstructionsController::class, 'searchAjax'])
     ->name('instructions.search.ajax');
 Route::post('/instructions/{instructionId}/set_approved', [InstructionsController::class, 'setApproved'])
     ->name('instructions.setApproved');
-Route::resource('/instructions', InstructionsController::class); // ->only([ 'index', 'show' ])
+Route::resource('/instructions', InstructionsController::class);
 
 
-
-//
 Route::post('/users/{userId}/set_blocked', [UserController::class, 'setBlocked'])
     ->name('users.setBlocked');
-//Route::post('/users/{userId}/set_unblocked', [UserController::class, 'setBlocked'])
-//    ->name('users.setUnBlocked');
 
 Route::resource('/users', UserController::class);
 

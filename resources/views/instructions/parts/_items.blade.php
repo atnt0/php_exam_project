@@ -14,29 +14,12 @@
         <td>
             <a href="{{ route('instructions.show', $instruction->id) }}" class="btn btn-primary">View</a>
         </td>
-
-{{--        Actions moved to view--}}
-
-{{--        <td>--}}
-{{--        @if( \App\Http\Controllers\InstructionsController::hasRights($instruction) )--}}
-{{--            <a href="{{ route('instructions.edit', $instruction->id) }}" class="btn btn-primary">Edit</a>--}}
-{{--        @endif--}}
-{{--        </td>--}}
-{{--        <td>--}}
-{{--            @if( \App\Http\Controllers\InstructionsController::hasRights($instruction) )--}}
-{{--                <form action="{{ route('instructions.destroy', $instruction->id) }}" method="post">--}}
-{{--                    @csrf--}}
-{{--                    @method('DELETE')--}}
-{{--                    <button class="btn btn-danger" type="submit">Delete</button>--}}
-{{--                </form>--}}
-{{--            @endif--}}
-{{--        </td>--}}
         <td>
-
+            {{--        Actions moved to view--}}
         </td>
         <td>
         @if( \App\Models\User::hasRightsAdmin() )
-            <a href="{{ route('instructions.complaints.indexComplaintsforInstruction', $instruction->id )}}"
+            <a href="{{ route('instructions.complaints.indexComplaintsForInstruction', $instruction->id )}}"
                class="btn btn-primary" title="All complaints for Instruction">All_Complaints</a>
         @endif
         </td>

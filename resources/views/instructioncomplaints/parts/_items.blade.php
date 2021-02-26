@@ -32,7 +32,7 @@
         <td>
 {{--            {{ dd(Illuminate\Support\Facades\Route::currentRouteName()) }}--}}
             @if( \Illuminate\Support\Facades\Route::currentRouteName() == 'instructions.complaints.index' )
-            <a href="{{ route('instructions.complaints.indexComplaintsforInstruction', ['instructionId' => $complaint->instruction_id] )}}"
+            <a href="{{ route('instructions.complaints.indexComplaintsForInstruction', ['instructionId' => $complaint->instruction_id] )}}"
                class="btn btn-primary" title="All complaints for Instruction">All_Complaints</a>
             @endif
         </td>

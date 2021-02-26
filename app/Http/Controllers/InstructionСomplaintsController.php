@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Instruction;
 use App\Models\InstructionComplaint;
 use App\Models\InstructionComplaintStatus;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,7 @@ class InstructionСomplaintsController extends Controller
         if ( Auth::guest() )
             return redirect('/login');
 
-        if( !InstructionsController::hasRightsAdmin() )
+        if( ! User::hasRightsAdmin() )
             return redirect('/instructions');
 
 
@@ -171,7 +172,7 @@ class InstructionСomplaintsController extends Controller
         if ( Auth::guest() )
             return redirect('/login');
 
-        if( !InstructionsController::hasRightsAdmin() )
+        if( ! User::hasRightsAdmin() )
             return redirect('/instructions');
 
         $instruction = Instruction::find($instructionId);
