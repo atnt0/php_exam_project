@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\InstructionsController;
 use App\Http\Controllers\InstructionСomplaintsController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,5 +68,11 @@ Route::resource('/instructions', InstructionsController::class); // ->only([ 'in
 
 
 
-Route::resource('/users', \App\Http\Controllers\UserController::class);
+//
+Route::post('/users/{userId}/set_blocked', [UserController::class, 'setBlocked'])
+    ->name('users.setBlocked');
+//Route::post('/users/{userId}/set_unblocked', [UserController::class, 'setBlocked'])
+//    ->name('users.setUnBlocked');
+
+Route::resource('/users', UserController::class);
 

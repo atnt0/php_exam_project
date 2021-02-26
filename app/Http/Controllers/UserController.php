@@ -21,6 +21,12 @@ class UserController extends Controller
 
         $users = User::all();
 
+        if( count($users) > 0 ) {
+            foreach ($users as $k => $user){
+                $users[$k]['is_blocked'] = $user->blocked_at != null;
+            }
+        }
+
         return view('users.index', compact('users'));
     }
 
@@ -74,7 +80,9 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        return view('users.show', compact('user'));
+        $isBlocked = $user->blocked_at != null;
+
+        return view('users.show', compact('user', 'isBlocked'));
     }
 
     /**
@@ -150,31 +158,30 @@ class UserController extends Controller
 
     public function setBlocked(Request $request, $userId)
     {
-        dd($userId);
-
-
         if( ! User::hasRightsAdmin() )
             abort(403);
 
         $request->validate([
-            'name' => 'required|min:3',
-            'email' => 'required|string|email|max:255', // |unique:users
-            'password' => 'required|string|min:8', // |confirmed
+            'block' => 'required|integer',
         ]);
 
-        $data = $request->all();
+        //TODO как получить и проверить именно bool ?
+        $block = (bool) $request->get('block');
 
-        $user = User::find($id);
+        $user = User::find($userId);
 
-        $user->update([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        if( empty($user) )
+            abort(404);
+
+        $user->blocked_at = $block ? date("Y-m-d h:i:s", time()) : null;
+        $user->save();
+
+
 
         return redirect()
-            ->route('users.index')
-            ->with('success', 'User updated successfully!');
+            ->route('users.show', [$user->id])
+            ->with('success', ($block ? 'User Blocked!' : 'User UnBlocked!') );
     }
+
 
 }
