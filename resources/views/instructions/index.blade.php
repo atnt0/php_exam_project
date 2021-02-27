@@ -31,7 +31,7 @@
                     <div class="float-right">
                         <form id="searchForm" name="searchForm" action="{{ route('instructions.search.ajax') }}" method="post">
                             @csrf
-                            <input type="text" name="searchString" placeholder="sound name" />
+                            <input type="text" name="searchString" placeholder="name" />
                             <button class="btn btn-primary" type="submit">Search</button>
                         </form>
                     </div>
